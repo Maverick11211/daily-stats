@@ -33,11 +33,11 @@
   .card-header{padding:13px 16px;background:var(--bg2);border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center}
   .card-header-title{font-size:15px;font-weight:500}
   .btn-danger{font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;padding:4px 8px;font-family:inherit}
-  table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:360px}
-  th{padding:10px 12px;text-align:right;font-size:13px;font-weight:600;color:var(--text);border-bottom:0.5px solid var(--border);background:var(--bg2);text-transform:uppercase;letter-spacing:0.05em}
-  th:first-child{text-align:left;padding-left:16px;width:110px}
-  td{padding:11px 12px;text-align:right;font-size:14px;border-bottom:0.5px solid var(--border);color:var(--text)}
-  td:first-child{text-align:left;padding-left:16px;font-size:15px;font-weight:600;white-space:nowrap;color:var(--text)}
+  table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:420px}
+  th{padding:11px 10px;text-align:right;font-size:13px;font-weight:600;color:var(--text);border-bottom:0.5px solid var(--border);background:var(--bg2);text-transform:uppercase;letter-spacing:0.05em}
+  th:first-child{text-align:left;padding-left:16px;width:150px}
+  td{padding:12px 10px;text-align:right;font-size:15px;border-bottom:0.5px solid var(--border);color:var(--text)}
+  td:first-child{text-align:left;padding-left:16px;font-size:13px;font-weight:600;white-space:nowrap;color:var(--text)}
   tr:nth-child(even) td{background:var(--bg2)}
   tr:last-child td{border-bottom:none}
   .table-wrap{overflow-x:auto}
@@ -221,6 +221,7 @@ const SET_K='daily_stats_settings';
 const ROLLING_PRESETS=[{label:'3D',days:3},{label:'7D',days:7},{label:'14D',days:14},{label:'1M',days:30},{label:'3M',days:90}];
 const RANGE_PRESETS=[
   {label:'2026',start:new Date(2026,0,1)},
+  {label:'2025',start:new Date(2025,0,1)},
   {label:'All data',start:new Date(2024,7,13)},
 ];
 const UNIT_DAYS={days:1,weeks:7,months:30};
@@ -418,15 +419,21 @@ function lookupDate(iso){
     {label:'Change % (Value)',key:'change',pct:true},
     {label:'Change % (Rolling)',key:'change2',pct:true},
   ];
+  const cInvalid=rangeStart<new Date(2026,0,1);
   let tbody='';
   rows.forEach((row,ri)=>{
     const bg=ri%2===0?'':'background:#f8f8f7';
     let cells=`<td style="${bg}">${row.label}</td>`;
     KEYS.forEach(k=>{
       const v=stats[row.key][k];
+      const isC=k==='c';
       let col='';
-      if(row.pct&&v!=='N/A'&&v!==null&&!isNaN(v))col=v<0?'color:#16a34a':v>0?'color:#dc2626':'';
-      cells+=`<td style="text-align:right;font-weight:${row.pct?500:400};${col};${bg}">${fmt(v,row.pct)}</td>`;
+      if(row.pct&&v!=='N/A'&&v!==null&&!isNaN(v)){
+        if(k==='dayRating') col=v>0?'color:#16a34a':v<0?'color:#dc2626':'';
+        else col=v<0?'color:#16a34a':v>0?'color:#dc2626':'';
+      }
+      const strike=isC&&cInvalid?'text-decoration:line-through;color:var(--text3);':'';
+      cells+=`<td style="text-align:right;font-weight:${row.pct?500:400};${col};${strike};${bg}">${fmt(v,row.pct)}</td>`;
     });
     tbody+=`<tr>${cells}</tr>`;
   });
@@ -442,8 +449,6 @@ function lookupDate(iso){
       <tbody>${tbody}</tbody>
     </table></div>
     <div class="card-footer">
-      Change % (Value) = (Value &minus; Period Avg) / Period Avg<br>
-      Change % (Rolling) = (Rolling Avg &minus; Period Avg) / Period Avg<br>
       <span style="color:#16a34a">negative = below avg</span> &nbsp;·&nbsp; N/A values use 20 in Change % formulas
     </div>
   </div>`;
@@ -484,6 +489,9 @@ function renderField(){
   const rl=periodLabel();
   const ds=new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'long',day:'numeric',year:'numeric'});
   const colLabel=COLS[KEYS.indexOf(fieldCol)];
+  const cInvalidField=rangeStart<new Date(2026,0,1);
+  const colStrike=fieldCol==='c'&&cInvalidField;
+  const colLabelDisplay=colStrike?`<span style="text-decoration:line-through;color:var(--text3)">${colLabel}</span>`:colLabel;
   const allRows=[
     {key:'value',label:'Value',pct:false},
     {key:'rolling',label:rl+' Avg',pct:false},
@@ -499,21 +507,25 @@ function renderField(){
     const v=stats[row.key][fieldCol];
     const bg=ri%2===0?'':'background:#f8f8f7';
     let col='';
-    if(row.pct&&v!=='N/A'&&v!==null&&!isNaN(v))col=v<0?'color:#16a34a':v>0?'color:#dc2626':'';
-    rows+=`<tr><td style="${bg}">${row.label}</td><td style="text-align:right;font-size:22px;font-weight:600;${col};${bg}">${fmt(v,row.pct)}</td></tr>`;
+    if(row.pct&&v!=='N/A'&&v!==null&&!isNaN(v)){
+      if(fieldCol==='dayRating') col=v>0?'color:#16a34a':v<0?'color:#dc2626':'';
+      else col=v<0?'color:#16a34a':v>0?'color:#dc2626':'';
+    }
+    const strike=colStrike?'text-decoration:line-through;color:var(--text3);':'';
+    rows+=`<tr><td style="${bg}">${row.label}</td><td style="text-align:right;font-size:22px;font-weight:600;${col};${strike};${bg}">${fmt(v,row.pct)}</td></tr>`;
   });
   el.innerHTML=`<div class="card">
     <div class="card-header">
       <div>
         <div style="font-size:15px;font-weight:500">${ds}</div>
-        <div style="font-size:12px;color:#999;margin-top:2px">${colLabel}</div>
+        <div style="font-size:12px;color:#999;margin-top:2px">${colLabelDisplay}</div>
       </div>
     </div>
     <div class="table-wrap"><table style="min-width:0">
-      <thead><tr><th style="width:140px"></th><th style="text-align:right">${colLabel}</th></tr></thead>
+      <thead><tr><th style="width:160px"></th><th style="text-align:right">${colLabelDisplay}</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>
-    <div class="card-footer">Change % (Value) = (Value &minus; Period Avg) / Period Avg &nbsp;·&nbsp; Change % (Rolling) = (Rolling Avg &minus; Period Avg) / Period Avg</div>
+    <div class="card-footer"><span style="color:#16a34a">negative = below avg</span> &nbsp;·&nbsp; N/A values use 20 in Change % formulas</div>
   </div>`;
 }
 
