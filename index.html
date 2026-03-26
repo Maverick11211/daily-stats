@@ -13,9 +13,8 @@
     --radius:8px;--radius-lg:12px;
     --green:#16a34a;--red:#dc2626;--blue:#2563eb;
   }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;padding:1rem}
-  .wrap{max-width:540px;margin:0 auto}
+  .wrap{max-width:580px;margin:0 auto}
   h1{font-size:22px;font-weight:500;margin-bottom:4px}
   .subtitle{font-size:13px;color:var(--text2);margin-bottom:1.5rem}
   .tabs{display:flex;gap:8px;margin-bottom:1.5rem}
@@ -29,19 +28,18 @@
   .pill.active{border-color:var(--text);background:var(--text);color:#fff;font-weight:500}
   .pill-custom{padding:6px 12px;border-radius:20px;font-size:13px;cursor:pointer;border:1.5px dashed var(--border2);background:transparent;color:var(--text2);font-family:inherit}
   .pill-custom:hover{border-color:var(--text2);color:var(--text)}
-  .card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+  .card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:1rem}
   .card-header{padding:13px 16px;background:var(--bg2);border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center}
   .card-header-title{font-size:15px;font-weight:500}
   .btn-danger{font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;padding:4px 8px;font-family:inherit}
-  table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:420px}
-  th{padding:11px 10px;text-align:right;font-size:13px;font-weight:600;color:var(--text);border-bottom:0.5px solid var(--border);background:var(--bg2);text-transform:uppercase;letter-spacing:0.05em}
-  th:first-child{text-align:left;padding-left:16px;width:150px}
-  td{padding:12px 10px;text-align:right;font-size:15px;border-bottom:0.5px solid var(--border);color:var(--text)}
-  td:first-child{text-align:left;padding-left:16px;font-size:13px;font-weight:600;white-space:nowrap;color:var(--text)}
+  table{width:100%;border-collapse:collapse;table-layout:auto}
+  th{padding:11px 12px;text-align:right;font-size:13px;font-weight:600;color:var(--text);border-bottom:0.5px solid var(--border);background:var(--bg2);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap}
+  th:first-child{text-align:left;padding-left:16px}
+  td{padding:12px 12px;text-align:right;font-size:15px;border-bottom:0.5px solid var(--border);color:var(--text);white-space:nowrap}
+  td:first-child{text-align:left;padding-left:16px;font-size:13px;font-weight:600;color:var(--text)}
   tr:nth-child(even) td{background:var(--bg2)}
   tr:last-child td{border-bottom:none}
   .table-wrap{overflow-x:auto}
-  .card-footer{padding:8px 16px;background:var(--bg2);border-top:0.5px solid var(--border);font-size:11px;color:var(--text3);line-height:1.6}
   .delete-bar{padding:10px 16px;background:#fef2f2;border-bottom:0.5px solid #fecaca;display:flex;justify-content:space-between;align-items:center}
   .delete-bar span{font-size:13px;color:var(--red)}
   .delete-bar div{display:flex;gap:8px}
@@ -49,7 +47,7 @@
   .btn-confirm{color:var(--red);background:none;border:0.5px solid #fca5a5}
   .btn-cancel{color:var(--text2);background:none;border:0.5px solid var(--border)}
   .msg{text-align:center;padding:3rem 0;font-size:14px;color:var(--text2)}
-  .not-found{padding:1rem;background:var(--bg2);border-radius:var(--radius);font-size:14px;color:var(--text2);text-align:center}
+  .not-found{padding:1rem;background:var(--bg2);border-radius:var(--radius);font-size:14px;color:var(--text2);text-align:center;margin-bottom:1rem}
   .history-list{display:flex;flex-direction:column;gap:6px}
   .history-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);cursor:pointer}
   .history-item:hover{background:var(--bg2)}
@@ -90,20 +88,30 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('lookup',this)">Summary</button>
-    <button class="tab" onclick="switchTab('field',this)">Field</button>
+    <button class="tab active" onclick="switchTab('field',this)">Field</button>
     <button class="tab" onclick="switchTab('history',this)">History</button>
     <button class="tab" onclick="switchTab('settings',this)">Settings</button>
   </div>
 
-  <!-- SUMMARY -->
-  <div id="tab-lookup">
+  <!-- FIELD (main tab) -->
+  <div id="tab-field">
     <div id="sync-bar" class="sync-bar" style="display:none">
       <span id="sync-status">Connected to Google Sheet</span>
       <button class="btn-sync" id="sync-btn" onclick="syncFromSheet()">Sync now</button>
     </div>
 
-    <input type="date" id="date-picker" style="margin-bottom:1rem" oninput="lookupDate(this.value)"/>
+    <input type="date" id="field-date-picker" style="margin-bottom:1rem" oninput="renderField()"/>
+
+    <div style="margin-bottom:1.25rem">
+      <div class="section-label">Columns</div>
+      <div class="pill-bar" id="field-col-pills">
+        <button class="pill active" onclick="toggleFieldCol('dayRating',this)">Day Rating</button>
+        <button class="pill active" onclick="toggleFieldCol('d',this)">D</button>
+        <button class="pill active" onclick="toggleFieldCol('w',this)">W</button>
+        <button class="pill active" onclick="toggleFieldCol('n',this)">N</button>
+        <button class="pill active" onclick="toggleFieldCol('c',this)">C</button>
+      </div>
+    </div>
 
     <div style="margin-bottom:1.25rem">
       <div class="section-label">Rolling average</div>
@@ -113,29 +121,6 @@
     <div style="margin-bottom:1.25rem">
       <div class="section-label">Period</div>
       <div class="pill-bar" id="range-pill-bar"></div>
-    </div>
-
-    <div id="lookup-result"></div>
-  </div>
-
-  <!-- FIELD -->
-  <div id="tab-field" style="display:none">
-    <input type="date" id="field-date-picker" style="margin-bottom:1rem" oninput="renderField()"/>
-
-    <div style="margin-bottom:1.25rem">
-      <div class="section-label">Column</div>
-      <div class="pill-bar" id="field-col-pills">
-        <button class="pill active" onclick="selectFieldCol('dayRating',this)">Day Rating</button>
-        <button class="pill" onclick="selectFieldCol('d',this)">D</button>
-        <button class="pill" onclick="selectFieldCol('w',this)">W</button>
-        <button class="pill" onclick="selectFieldCol('n',this)">N</button>
-        <button class="pill" onclick="selectFieldCol('c',this)">C</button>
-      </div>
-    </div>
-
-    <div style="margin-bottom:1.25rem">
-      <div class="section-label">Period</div>
-      <div class="pill-bar" id="field-range-pill-bar"></div>
     </div>
 
     <div id="field-stat-toggles" style="display:none;margin-bottom:1.25rem">
@@ -177,7 +162,7 @@
   </div>
 </div>
 
-<!-- CUSTOM PERIOD MODAL -->
+<!-- CUSTOM ROLLING MODAL -->
 <div class="modal-bg" id="custom-modal" style="display:none" onclick="if(event.target===this)closeCustomModal()">
   <div class="modal-box">
     <h3>Custom rolling period</h3>
@@ -185,7 +170,7 @@
       <label style="font-size:13px;color:var(--text2);display:block;margin-bottom:6px">Number</label>
       <input type="number" min="1" id="custom-val" value="3" style="margin-bottom:1rem"/>
     </div>
-    <div class="unit-btns" id="unit-btns">
+    <div class="unit-btns">
       <button class="unit-btn active" onclick="setUnit('days')">Days</button>
       <button class="unit-btn" onclick="setUnit('weeks')">Weeks</button>
       <button class="unit-btn" onclick="setUnit('months')">Months</button>
@@ -217,7 +202,6 @@ const SK='daily_stats_v4';
 const PK='daily_stats_period';
 const RK='daily_stats_range';
 const SET_K='daily_stats_settings';
-
 const ROLLING_PRESETS=[{label:'3D',days:3},{label:'7D',days:7},{label:'14D',days:14},{label:'1M',days:30},{label:'3M',days:90}];
 const RANGE_PRESETS=[
   {label:'2026',start:new Date(2026,0,1)},
@@ -231,28 +215,22 @@ let period={unit:'days',val:3,days:3};
 let rangeStart=new Date(2026,0,1);
 let rangeLabel='2026';
 let settings={url:'',token:''};
-let pendingDelete=null;
 let selectedUnit='days';
-let fieldCol='dayRating';
+let fieldCols=new Set(['dayRating','d','w','n','c']);
 let fieldRows={value:true,rolling:true,avg:true,change:true,change2:true};
+let pendingDelete=null;
 
 function parseDate(s){const[m,d,y]=s.split('/');return new Date(2000+parseInt(y),parseInt(m)-1,parseInt(d));}
 function toStorage(iso){const[y,m,d]=iso.split('-');return`${parseInt(m)}/${parseInt(d)}/${String(y).slice(2)}`;}
 function toIso(s){const[m,d,y]=s.split('/');return`20${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
-
 function isNA(v){return v==='N/A'||v===null||v===undefined||v==='';}
-
 function fmt(v,pct){
   if(v==='N/A')return'<span class="na-cell">N/A</span>';
   if(v===null||v===undefined||isNaN(v))return'—';
   if(pct)return(v>=0?'+':'')+v.toFixed(2)+'%';
   return parseFloat(v.toFixed(3)).toString();
 }
-
-function yesterday(){
-  const d=new Date();d.setDate(d.getDate()-1);
-  return d.toISOString().split('T')[0];
-}
+function yesterday(){const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().split('T')[0];}
 
 function calcStats(key,n,rStart){
   const s=[...entries].sort((a,b)=>parseDate(a.date)-parseDate(b.date));
@@ -261,37 +239,22 @@ function calcStats(key,n,rStart){
   const entry=s[idx];
   const targetDate=parseDate(key);
   const r={value:{},rolling:{},avg:{},change:{},change2:{}};
-
   KEYS.forEach(k=>{
     const raw=entry[k];
     const naVal=isNA(raw);
     const val=naVal?null:parseFloat(raw);
-
-    // Value
     r.value[k]=naVal?'N/A':(isNaN(val)?null:val);
-
-    // Rolling avg — show N/A if current value is N/A (only applies to d)
     if(naVal){
       r.rolling[k]='N/A';
     } else {
-      const lastN=s.slice(Math.max(0,idx-(n-1)),idx+1).map(e=>{
-        const v=e[k];return isNA(v)?null:parseFloat(v);
-      }).filter(v=>v!==null&&!isNaN(v));
+      const lastN=s.slice(Math.max(0,idx-(n-1)),idx+1).map(e=>{const v=e[k];return isNA(v)?null:parseFloat(v);}).filter(v=>v!==null&&!isNaN(v));
       r.rolling[k]=lastN.length?lastN.reduce((a,b)=>a+b,0)/lastN.length:null;
     }
-
-    // Period avg — from rangeStart to targetDate, skip N/A
-    const rangeVals=s.filter(e=>{const d=parseDate(e.date);return d>=rStart&&d<=targetDate;})
-      .map(e=>{const v=e[k];return isNA(v)?null:parseFloat(v);})
-      .filter(v=>v!==null&&!isNaN(v));
+    const rangeVals=s.filter(e=>{const d=parseDate(e.date);return d>=rStart&&d<=targetDate;}).map(e=>{const v=e[k];return isNA(v)?null:parseFloat(v);}).filter(v=>v!==null&&!isNaN(v));
     r.avg[k]=rangeVals.length?rangeVals.reduce((a,b)=>a+b,0)/rangeVals.length:null;
-
-    // Change % (Value) — treat N/A as 20
-    const vForChange=naVal?20:(isNaN(val)?null:val);
     const av=r.avg[k];
+    const vForChange=naVal?20:(isNaN(val)?null:val);
     r.change[k]=(vForChange!==null&&av!==null&&av!==0)?((vForChange-av)/av)*100:null;
-
-    // Change % (Rolling) — treat N/A rolling as 20
     const rdRaw=r.rolling[k];
     const rdForChange=rdRaw==='N/A'?20:rdRaw;
     r.change2[k]=(rdForChange!==null&&av!==null&&av!==0)?((rdForChange-av)/av)*100:null;
@@ -299,34 +262,50 @@ function calcStats(key,n,rStart){
   return r;
 }
 
-function periodLabel(){
-  const u=period.unit==='days'?'D':period.unit==='weeks'?'W':'M';
-  return`${period.val}${u}`;
+function periodLabel(){const u=period.unit==='days'?'D':period.unit==='weeks'?'W':'M';return`${period.val}${u}`;}
+
+// ---- Rolling pills ----
+function renderPills(){
+  const bar=document.getElementById('period-pill-bar');
+  const isCustom=!ROLLING_PRESETS.find(p=>p.days===period.days);
+  let html=ROLLING_PRESETS.map(p=>`<button class="pill${period.days===p.days?' active':''}" onclick="selectPreset(${p.days})">${p.label}</button>`).join('');
+  html+=`<button class="pill-custom${isCustom?' pill active':''}" onclick="openCustomModal()">${isCustom?periodLabel()+' ✕':'Custom…'}</button>`;
+  bar.innerHTML=html;
+}
+function selectPreset(days){
+  if(days<7)period={unit:'days',val:days,days};
+  else if(days<30)period={unit:'weeks',val:Math.round(days/7),days};
+  else period={unit:'months',val:Math.round(days/30),days};
+  localStorage.setItem(PK,JSON.stringify(period));
+  renderPills();renderField();
+}
+function openCustomModal(){document.getElementById('custom-val').value=period.val;setUnit(period.unit);document.getElementById('custom-modal').style.display='flex';}
+function closeCustomModal(){document.getElementById('custom-modal').style.display='none';}
+function setUnit(u){selectedUnit=u;document.querySelectorAll('.unit-btn').forEach((b,i)=>{b.classList.toggle('active',['days','weeks','months'][i]===u);});}
+function applyCustom(){
+  const v=Math.max(1,parseInt(document.getElementById('custom-val').value)||1);
+  const days=v*UNIT_DAYS[selectedUnit];
+  period={unit:selectedUnit,val:v,days};
+  localStorage.setItem(PK,JSON.stringify(period));
+  closeCustomModal();renderPills();renderField();
 }
 
 // ---- Range pills ----
-function renderRangePills(barId){
-  const bar=document.getElementById(barId);
-  if(!bar)return;
+function toRangeDisplay(d){return`${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(2)}`;}
+function renderRangePills(){
+  const bar=document.getElementById('range-pill-bar');
   const isCustom=!RANGE_PRESETS.find(p=>p.label===rangeLabel);
   let html=RANGE_PRESETS.map(p=>`<button class="pill${rangeLabel===p.label?' active':''}" onclick="selectRange('${p.label}')">${p.label}</button>`).join('');
   html+=`<button class="pill-custom${isCustom?' pill active':''}" onclick="openRangeModal()">${isCustom?'From '+toRangeDisplay(rangeStart)+' ✕':'Custom…'}</button>`;
   bar.innerHTML=html;
 }
-
-function toRangeDisplay(d){return`${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(2)}`;}
-
 function selectRange(label){
   const preset=RANGE_PRESETS.find(p=>p.label===label);
   if(!preset)return;
   rangeStart=preset.start;rangeLabel=label;
   localStorage.setItem(RK,JSON.stringify({label,start:rangeStart.toISOString()}));
-  renderRangePills('range-pill-bar');
-  renderRangePills('field-range-pill-bar');
-  lookupDate(document.getElementById('date-picker').value);
-  renderField();
+  renderRangePills();renderField();
 }
-
 function openRangeModal(){
   const d=rangeStart;
   document.getElementById('custom-range-start').value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -337,136 +316,28 @@ function applyCustomRange(){
   const iso=document.getElementById('custom-range-start').value;
   if(!iso)return;
   const[y,m,d]=iso.split('-');
-  rangeStart=new Date(parseInt(y),parseInt(m)-1,parseInt(d));
-  rangeLabel='custom';
+  rangeStart=new Date(parseInt(y),parseInt(m)-1,parseInt(d));rangeLabel='custom';
   localStorage.setItem(RK,JSON.stringify({label:'custom',start:rangeStart.toISOString()}));
-  closeRangeModal();
-  renderRangePills('range-pill-bar');
-  renderRangePills('field-range-pill-bar');
-  lookupDate(document.getElementById('date-picker').value);
-  renderField();
-}
-
-// ---- Rolling period pills ----
-function renderPills(){
-  const bar=document.getElementById('period-pill-bar');
-  const isCustom=!ROLLING_PRESETS.find(p=>p.days===period.days);
-  let html=ROLLING_PRESETS.map(p=>`<button class="pill${period.days===p.days?' active':''}" onclick="selectPreset(${p.days})">${p.label}</button>`).join('');
-  html+=`<button class="pill-custom${isCustom?' pill active':''}" onclick="openCustomModal()">${isCustom?periodLabel()+' ✕':'Custom…'}</button>`;
-  bar.innerHTML=html;
-}
-
-function selectPreset(days){
-  if(days<7)period={unit:'days',val:days,days};
-  else if(days<30)period={unit:'weeks',val:Math.round(days/7),days};
-  else period={unit:'months',val:Math.round(days/30),days};
-  localStorage.setItem(PK,JSON.stringify(period));
-  renderPills();
-  lookupDate(document.getElementById('date-picker').value);
-}
-
-function openCustomModal(){
-  document.getElementById('custom-val').value=period.val;
-  setUnit(period.unit);
-  document.getElementById('custom-modal').style.display='flex';
-}
-function closeCustomModal(){document.getElementById('custom-modal').style.display='none';}
-function setUnit(u){
-  selectedUnit=u;
-  document.querySelectorAll('.unit-btn').forEach((b,i)=>{
-    b.classList.toggle('active',['days','weeks','months'][i]===u);
-  });
-}
-function applyCustom(){
-  const v=Math.max(1,parseInt(document.getElementById('custom-val').value)||1);
-  const days=v*UNIT_DAYS[selectedUnit];
-  period={unit:selectedUnit,val:v,days};
-  localStorage.setItem(PK,JSON.stringify(period));
-  closeCustomModal();
-  renderPills();
-  lookupDate(document.getElementById('date-picker').value);
+  closeRangeModal();renderRangePills();renderField();
 }
 
 // ---- Tab switching ----
 function switchTab(name,btn){
-  ['lookup','field','history','settings'].forEach(t=>{
-    document.getElementById('tab-'+t).style.display=t===name?'block':'none';
-  });
+  ['field','history','settings'].forEach(t=>{document.getElementById('tab-'+t).style.display=t===name?'block':'none';});
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   if(name==='history')renderHistory();
   if(name==='settings')loadSettingsForm();
-  if(name==='field'){renderRangePills('field-range-pill-bar');}
 }
 
-// ---- Summary tab ----
-function lookupDate(iso){
-  const el=document.getElementById('lookup-result');
-  if(!iso){el.innerHTML='<p class="msg">Pick a date above to view its statistics.</p>';return;}
-  const key=toStorage(iso);
-  const lookupDate=parseDate(key);
-  if(lookupDate<rangeStart){
-    el.innerHTML='<div class="not-found">This date is outside the selected period. Adjust the Period setting above.</div>';return;
+// ---- Column & row toggles ----
+function toggleFieldCol(col,btn){
+  if(fieldCols.has(col)){
+    if(fieldCols.size===1)return; // keep at least one
+    fieldCols.delete(col);btn.classList.remove('active');
+  } else {
+    fieldCols.add(col);btn.classList.add('active');
   }
-  if(!entries.find(e=>e.date===key)){el.innerHTML='<div class="not-found">No entry for this date.</div>';return;}
-  const stats=calcStats(key,period.days,rangeStart);
-  const rl=periodLabel();
-  const ds=new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'long',day:'numeric',year:'numeric'});
-  const rows=[
-    {label:'Value',key:'value',pct:false},
-    {label:rl+' Avg',key:'rolling',pct:false},
-    {label:'Period Avg',key:'avg',pct:false},
-    {label:'Change % (Value)',key:'change',pct:true},
-    {label:'Change % (Rolling)',key:'change2',pct:true},
-  ];
-  const cInvalid=rangeStart<new Date(2026,0,1);
-  let tbody='';
-  rows.forEach((row,ri)=>{
-    const bg=ri%2===0?'':'background:#f8f8f7';
-    let cells=`<td style="${bg}">${row.label}</td>`;
-    KEYS.forEach(k=>{
-      const v=stats[row.key][k];
-      const isC=k==='c';
-      let col='';
-      if(row.pct&&v!=='N/A'&&v!==null&&!isNaN(v)){
-        if(k==='dayRating') col=v>0?'color:#16a34a':v<0?'color:#dc2626':'';
-        else col=v<0?'color:#16a34a':v>0?'color:#dc2626':'';
-      }
-      const strike=isC&&cInvalid?'text-decoration:line-through;color:var(--text3);':'';
-      cells+=`<td style="text-align:right;font-weight:${row.pct?500:400};${col};${strike};${bg}">${fmt(v,row.pct)}</td>`;
-    });
-    tbody+=`<tr>${cells}</tr>`;
-  });
-  const delBar=pendingDelete===key?`<div class="delete-bar"><span>Delete this entry?</span><div><button class="btn-confirm" onclick="confirmDelete('${key}')">Yes</button><button class="btn-cancel" onclick="cancelDelete()">Cancel</button></div></div>`:'';
-  el.innerHTML=`<div class="card">
-    <div class="card-header">
-      <span class="card-header-title">${ds}</span>
-      <button class="btn-danger" onclick="startDelete('${key}')">Delete</button>
-    </div>
-    ${delBar}
-    <div class="table-wrap"><table>
-      <thead><tr><th></th>${COLS.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
-      <tbody>${tbody}</tbody>
-    </table></div>
-    <div class="card-footer">
-      <span style="color:#16a34a">negative = below avg</span> &nbsp;·&nbsp; N/A values use 20 in Change % formulas
-    </div>
-  </div>`;
-}
-
-function startDelete(k){pendingDelete=k;lookupDate(document.getElementById('date-picker').value);}
-function cancelDelete(){pendingDelete=null;lookupDate(document.getElementById('date-picker').value);}
-function confirmDelete(k){
-  entries=entries.filter(e=>e.date!==k);save();pendingDelete=null;
-  document.getElementById('date-picker').value=yesterday();
-  lookupDate(yesterday());
-}
-
-// ---- Field tab ----
-function selectFieldCol(col,btn){
-  fieldCol=col;
-  document.querySelectorAll('#field-col-pills .pill').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
   renderField();
 }
 function toggleFieldRow(key,btn){
@@ -474,24 +345,24 @@ function toggleFieldRow(key,btn){
   btn.classList.toggle('active',fieldRows[key]);
   renderField();
 }
+
+// ---- Field render ----
 function renderField(){
   const iso=document.getElementById('field-date-picker').value;
   const toggles=document.getElementById('field-stat-toggles');
   const el=document.getElementById('field-result');
-  if(!iso){el.innerHTML='<p class="msg">Pick a date above to view field statistics.</p>';toggles.style.display='none';return;}
+  if(!iso){el.innerHTML='<p class="msg">Pick a date above to view statistics.</p>';toggles.style.display='none';return;}
   const key=toStorage(iso);
   const fd=parseDate(key);
-  if(fd<rangeStart){
-    el.innerHTML='<div class="not-found">This date is outside the selected period.</div>';toggles.style.display='none';return;
-  }
+  if(fd<rangeStart){el.innerHTML='<div class="not-found">This date is outside the selected period.</div>';toggles.style.display='none';return;}
   if(!entries.find(e=>e.date===key)){el.innerHTML='<div class="not-found">No entry for this date.</div>';toggles.style.display='none';return;}
+
   const stats=calcStats(key,period.days,rangeStart);
   const rl=periodLabel();
   const ds=new Date(iso+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'long',day:'numeric',year:'numeric'});
-  const colLabel=COLS[KEYS.indexOf(fieldCol)];
-  const cInvalidField=rangeStart<new Date(2026,0,1);
-  const colStrike=fieldCol==='c'&&cInvalidField;
-  const colLabelDisplay=colStrike?`<span style="text-decoration:line-through;color:var(--text3)">${colLabel}</span>`:colLabel;
+  const cInvalid=rangeStart<new Date(2026,0,1);
+
+  const activeCols=KEYS.filter(k=>fieldCols.has(k));
   const allRows=[
     {key:'value',label:'Value',pct:false},
     {key:'rolling',label:rl+' Avg',pct:false},
@@ -499,50 +370,67 @@ function renderField(){
     {key:'change',label:'Change % (Value)',pct:true},
     {key:'change2',label:'Change % (Rolling)',pct:true},
   ];
-  const visible=allRows.filter(r=>fieldRows[r.key]);
+  const visibleRows=allRows.filter(r=>fieldRows[r.key]);
   toggles.style.display='flex';toggles.style.flexDirection='column';
-  if(!visible.length){el.innerHTML='<div class="not-found">No rows selected.</div>';return;}
-  let rows='';
-  visible.forEach((row,ri)=>{
-    const v=stats[row.key][fieldCol];
+  if(!visibleRows.length){el.innerHTML='<div class="not-found">No rows selected.</div>';return;}
+
+  // header
+  let thead=`<tr><th></th>${activeCols.map(k=>{
+    const label=COLS[KEYS.indexOf(k)];
+    const strike=k==='c'&&cInvalid?`<span style="text-decoration:line-through;color:var(--text3)">${label}</span>`:label;
+    return`<th>${strike}</th>`;
+  }).join('')}</tr>`;
+
+  let tbody='';
+  visibleRows.forEach((row,ri)=>{
     const bg=ri%2===0?'':'background:#f8f8f7';
-    let col='';
-    if(row.pct&&v!=='N/A'&&v!==null&&!isNaN(v)){
-      if(fieldCol==='dayRating') col=v>0?'color:#16a34a':v<0?'color:#dc2626':'';
-      else col=v<0?'color:#16a34a':v>0?'color:#dc2626':'';
-    }
-    const strike=colStrike?'text-decoration:line-through;color:var(--text3);':'';
-    rows+=`<tr><td style="${bg}">${row.label}</td><td style="text-align:right;font-size:22px;font-weight:600;${col};${strike};${bg}">${fmt(v,row.pct)}</td></tr>`;
+    let cells=`<td style="${bg}">${row.label}</td>`;
+    activeCols.forEach(k=>{
+      const v=stats[row.key][k];
+      const isC=k==='c'&&cInvalid;
+      let col='';
+      if(row.pct&&v!=='N/A'&&v!==null&&!isNaN(v)){
+        if(k==='dayRating') col=v>0?'color:#16a34a':v<0?'color:#dc2626':'';
+        else col=v<0?'color:#16a34a':v>0?'color:#dc2626':'';
+      }
+      const strike=isC?'text-decoration:line-through;color:var(--text3);':'';
+      cells+=`<td style="font-weight:${row.pct?500:400};${col};${strike};${bg}">${fmt(v,row.pct)}</td>`;
+    });
+    tbody+=`<tr>${cells}</tr>`;
   });
+
+  const delBar=pendingDelete===key?`<div class="delete-bar"><span>Delete this entry?</span><div><button class="btn-confirm" onclick="confirmDelete('${key}')">Yes</button><button class="btn-cancel" onclick="cancelDelete()">Cancel</button></div></div>`:'';
+
   el.innerHTML=`<div class="card">
     <div class="card-header">
-      <div>
-        <div style="font-size:15px;font-weight:500">${ds}</div>
-        <div style="font-size:12px;color:#999;margin-top:2px">${colLabelDisplay}</div>
-      </div>
+      <span class="card-header-title">${ds}</span>
+      <button class="btn-danger" onclick="startDelete('${key}')">Delete</button>
     </div>
-    <div class="table-wrap"><table style="min-width:0">
-      <thead><tr><th style="width:160px"></th><th style="text-align:right">${colLabelDisplay}</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table></div>
-    <div class="card-footer"><span style="color:#16a34a">negative = below avg</span> &nbsp;·&nbsp; N/A values use 20 in Change % formulas</div>
+    ${delBar}
+    <div class="table-wrap"><table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>
   </div>`;
+}
+
+function startDelete(k){pendingDelete=k;renderField();}
+function cancelDelete(){pendingDelete=null;renderField();}
+function confirmDelete(k){
+  entries=entries.filter(e=>e.date!==k);save();pendingDelete=null;
+  document.getElementById('field-date-picker').value=yesterday();
+  renderField();
 }
 
 // ---- History ----
 function renderHistory(){
-  const sorted=[...entries]
-    .filter(e=>parseDate(e.date)>=rangeStart)
-    .sort((a,b)=>parseDate(b.date)-parseDate(a.date));
+  const sorted=[...entries].filter(e=>parseDate(e.date)>=rangeStart).sort((a,b)=>parseDate(b.date)-parseDate(a.date));
   const el=document.getElementById('history-list');
   if(!sorted.length){el.innerHTML='<p class="msg">No entries in selected period.</p>';return;}
   el.innerHTML=sorted.map(e=>`<div class="history-item" onclick="jumpTo('${e.date}')"><span class="history-date">${e.date}</span><span class="history-meta">Rating: <strong>${e.dayRating||'—'}</strong></span></div>`).join('');
 }
 function jumpTo(sd){
   const iso=toIso(sd);
-  document.getElementById('date-picker').value=iso;
-  switchTab('lookup',document.querySelectorAll('.tab')[0]);
-  lookupDate(iso);
+  document.getElementById('field-date-picker').value=iso;
+  switchTab('field',document.querySelectorAll('.tab')[0]);
+  renderField();
 }
 
 // ---- Settings ----
@@ -583,43 +471,29 @@ async function syncFromSheet(){
     if(json.error)throw new Error(json.error);
     mergeEntries(json.entries);
     st.textContent='Synced — '+new Date().toLocaleTimeString();
-    lookupDate(document.getElementById('date-picker').value);
+    renderField();
   }catch(e){st.textContent='Sync failed: '+e.message;}
   btn.disabled=false;btn.textContent='Sync now';
 }
 function mergeEntries(remote){
-  const map={};
-  entries.forEach(e=>map[e.date]=e);
-  remote.forEach(e=>map[e.date]=e);
-  entries=Object.values(map).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
-  save();
+  const map={};entries.forEach(e=>map[e.date]=e);remote.forEach(e=>map[e.date]=e);
+  entries=Object.values(map).sort((a,b)=>parseDate(a.date)-parseDate(b.date));save();
 }
 function save(){localStorage.setItem(SK,JSON.stringify(entries));updateSubtitle();}
-function clearData(){
-  if(!confirm('Clear all local entries?'))return;
-  entries=[];localStorage.removeItem(SK);updateSubtitle();
-}
+function clearData(){if(!confirm('Clear all local entries?'))return;entries=[];localStorage.removeItem(SK);updateSubtitle();}
 
 // ---- Init ----
 function init(){
   const s=localStorage.getItem(SK);entries=s?JSON.parse(s):[];
   const p=localStorage.getItem(PK);if(p)period=JSON.parse(p);
   const rk=localStorage.getItem(RK);
-  if(rk){
-    const saved=JSON.parse(rk);
-    rangeLabel=saved.label;
-    rangeStart=new Date(saved.start);
-  }
+  if(rk){const saved=JSON.parse(rk);rangeLabel=saved.label;rangeStart=new Date(saved.start);}
   const st=localStorage.getItem(SET_K);if(st)settings=JSON.parse(st);
   if(settings.url&&settings.token)document.getElementById('sync-bar').style.display='flex';
-  updateSubtitle();
-  renderPills();
-  renderRangePills('range-pill-bar');
-  renderRangePills('field-range-pill-bar');
+  updateSubtitle();renderPills();renderRangePills();
   const yest=yesterday();
-  document.getElementById('date-picker').value=yest;
   document.getElementById('field-date-picker').value=yest;
-  lookupDate(yest);
+  renderField();
 }
 init();
 </script>
